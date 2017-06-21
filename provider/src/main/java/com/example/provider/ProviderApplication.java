@@ -15,7 +15,7 @@ public class ProviderApplication {
         SpringApplication.run(ProviderApplication.class, args);
     }
 
-    @RequestMapping("/")
+    @RequestMapping("/p")
     public String home() {
         return "Provider";
     }

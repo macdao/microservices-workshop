@@ -24,9 +24,9 @@ public class ConsumerApplication {
     }
 
 
-    @RequestMapping("/")
+    @RequestMapping("/c")
     public String home() {
-        final String response = restTemplate.getForObject("http://provider", String.class);
+        final String response = restTemplate.getForObject("http://provider/p", String.class);
         return "Consumer:" + response;
     }
 
