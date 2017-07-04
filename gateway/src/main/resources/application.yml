@@ -1,3 +1,6 @@
 spring:
   application:
     name: gateway
+security:
+  user:
+    password: 123456
