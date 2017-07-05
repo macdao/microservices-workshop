@@ -1,7 +1,6 @@
 package com.example.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,7 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -76,11 +77,11 @@ public class ConsumerApplication {
                             final String plain = authorization.substring("PLAIN ".length());
                             final Map map = new ObjectMapper().readValue(plain, Map.class);
                             final String name = (String) map.get("name");
+                            @SuppressWarnings("unchecked") final List<String> authorities = (List<String>) map.get("authorities");
                             SecurityContextHolder.getContext().setAuthentication(new Authentication() {
                                 @Override
                                 public Collection<? extends GrantedAuthority> getAuthorities() {
-                                    return ImmutableList.of(new SimpleGrantedAuthority("ROLE_USER"),
-                                            new SimpleGrantedAuthority("ROLE_ACTUATOR"));
+                                    return authorities.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
                                 }
 
                                 @Override
