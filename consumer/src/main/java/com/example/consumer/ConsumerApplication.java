@@ -3,7 +3,6 @@ package com.example.consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -42,8 +41,8 @@ public class ConsumerApplication {
     @Autowired
     private RestTemplate restTemplate;
 
-    @Value("${my.name}")
-    private String name;
+    @Autowired
+    private MyBean myBean;
 
     public static void main(String[] args) {
         SpringApplication.run(ConsumerApplication.class, args);
@@ -54,7 +53,7 @@ public class ConsumerApplication {
     @PreAuthorize("hasRole('USER')")
     public String home(Principal principal) {
         final String response = restTemplate.getForObject("http://provider/p", String.class);
-        return "Consumer:Response/" + response + ":config/" + name + ":principal/" + principal.getName();
+        return "Consumer:Response/" + response + ":config/" + myBean.getName() + ":principal/" + principal.getName();
     }
 
     @LoadBalanced
@@ -69,7 +68,7 @@ public class ConsumerApplication {
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
-            http
+            http.csrf().disable()
                     .addFilterBefore(new OncePerRequestFilter() {
                         @Override
                         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -80,7 +79,8 @@ public class ConsumerApplication {
                             SecurityContextHolder.getContext().setAuthentication(new Authentication() {
                                 @Override
                                 public Collection<? extends GrantedAuthority> getAuthorities() {
-                                    return ImmutableList.of(new SimpleGrantedAuthority("ROLE_USER"));
+                                    return ImmutableList.of(new SimpleGrantedAuthority("ROLE_USER"),
+                                            new SimpleGrantedAuthority("ROLE_ACTUATOR"));
                                 }
 
                                 @Override
