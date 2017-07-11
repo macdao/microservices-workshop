@@ -74,6 +74,10 @@ public class ConsumerApplication {
                         @Override
                         protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
                             final String authorization = request.getHeader("Authorization");
+                            if (authorization == null) {
+                                filterChain.doFilter(request, response);
+                                return;
+                            }
                             final String plain = authorization.substring("PLAIN ".length());
                             final Map map = new ObjectMapper().readValue(plain, Map.class);
                             final String name = (String) map.get("name");
