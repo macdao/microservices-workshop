@@ -3,4 +3,6 @@ spring:
     name: consumer
   cloud:
     config:
-      uri: ${SPRING_CONFIG_URI:http://localhost:8888}
+      uri: ${vcap.services.config-server.credentials.uri:http://localhost:8888}
+my:
+  name: from-bootstrap
